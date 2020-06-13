@@ -1,0 +1,6 @@
+#import "./fragments/config.graphql"
+query ($limit: Int, $where: config_bool_exp){
+  config(order_by: {timestamp: desc}, limit: $limit, where: $where) {
+    ...ConfigFields
+  }
+}

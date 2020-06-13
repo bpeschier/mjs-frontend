@@ -3,27 +3,16 @@
     <thead>
     <tr>
       <th class="bundle-table__timestamp">Timestamp</th>
-      <th class="bundle-table__node">Node / ID</th>
       <th class="bundle-table__data">Data</th>
     </tr>
     </thead>
     <transition-group name="list" tag="tbody">
       <tr v-for="m in bundle" :key="m.message_id" class="bundle-table__line">
-        <td>{{ m.timestamp }}</td>
-        <td>
-          {{ m.node_id }} / {{ m.message_id }}
+        <td class="bundle-table__timestamp">
+          {{ timestamp(m.timestamp) }}
         </td>
         <td>
-          <table class="bundle-table__data-values">
-            <tbody>
-            <tr>
-              <th v-for="key in Object.keys(m.data)">{{ key }}</th>
-            </tr>
-            <tr>
-              <td v-for="value in Object.values(m.data)">{{ value }}</td>
-            </tr>
-            </tbody>
-          </table>
+          <pre>{{ m.data }}</pre>
         </td>
       </tr>
     </transition-group>
@@ -32,15 +21,39 @@
 
 <script>
 
+import { parseISO } from 'date-fns';
 import BUNDLE_QUERY from '../graphql/bundle.graphql';
 import BUNDLE_SUBSCRIPTION from '../graphql/subscription/bundle.graphql';
 
 export default {
+  props: {
+    nodeId: {
+      type: String,
+      default: () => null,
+    },
+  },
   data() {
     return {
       limit: 10,
       bundle: [],
     };
+  },
+
+  methods: {
+    timestamp(timestamp) {
+      const options = {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZone: 'Europe/Amsterdam',
+        timeZoneName: 'short',
+      };
+      return Intl.DateTimeFormat('nl-NL',
+        options).format(parseISO(`${timestamp}Z`));
+    },
   },
 
   apollo: {
@@ -49,6 +62,7 @@ export default {
       variables() {
         return {
           limit: this.limit,
+          where: { node_id: { _eq: this.nodeId } },
         };
       },
       subscribeToMore: {
@@ -56,6 +70,7 @@ export default {
         variables() {
           return {
             limit: this.limit,
+            where: { node_id: { _eq: this.nodeId } },
           };
         },
         updateQuery(previousResult, { subscriptionData }) {
@@ -73,20 +88,21 @@ export default {
     width: 100%;
 
     &__timestamp {
-      width: 200px;
+      width: 100px;
     }
 
-    &__line {
-      &:nth-child(2n) {
-        background-color: #eee;
-      }
+    pre {
+      margin: 0;
+      padding: 10px;
+      background-color: #eee;
     }
 
-    &__data-values {
-      th, td {
-        text-align: left;
-      }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 10px;
     }
+
   }
 
   .list-move {

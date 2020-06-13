@@ -1,6 +1,7 @@
 fragment MeasurementFields on measurement {
-    id
+    meas_id
     node_id
+    channel_id
     data
     timestamp
 }

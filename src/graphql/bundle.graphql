@@ -1,6 +1,6 @@
 #import "./fragments/bundle.graphql"
-query ($limit: Int){
-  bundle(order_by: {timestamp: desc}, limit: $limit) {
+query ($limit: Int, $where: bundle_bool_exp){
+  bundle(order_by: {timestamp: desc}, limit: $limit, where: $where) {
     ...BundleFields
   }
 }

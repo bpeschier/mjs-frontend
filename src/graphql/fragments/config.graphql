@@ -1,0 +1,5 @@
+fragment ConfigFields on config {
+    node_id
+    timestamp
+    data
+}

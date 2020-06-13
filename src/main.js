@@ -8,6 +8,8 @@ import store from './store';
 import router from './router';
 import App from './App.vue';
 
+import 'vant/lib/index.css';
+
 Vue.config.productionTip = false;
 
 
@@ -17,11 +19,7 @@ const wsLink = new WebSocketLink({
   uri: process.env.VUE_APP_GRAPHQL_WS || 'ws://localhost:4000/graphql',
   options: {
     reconnect: true,
-    connectionParams: {
-      headers: {
-        'x-hasura-admin-secret': process.env.VUE_APP_GRAPHQL_TOKEN,
-      },
-    },
+    lazy: true,
   },
 });
 
@@ -39,5 +37,5 @@ new Vue({
   router,
   store,
   apolloProvider,
-  render: h => h(App),
+  render: (h) => h(App),
 }).$mount('#app');
